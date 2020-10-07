@@ -1,7 +1,7 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.presenter
 
 import android.os.Parcelable
-import com.drawingboardapps.memoryleak.mvp.ui.mvp.fragment.FragmentType
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.FragmentType
 import kotlinx.android.parcel.Parcelize
 
 sealed class PresenterLeakType : Parcelable {
