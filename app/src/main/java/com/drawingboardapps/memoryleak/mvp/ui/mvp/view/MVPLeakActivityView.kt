@@ -1,6 +1,7 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.view
 
-interface MVPLeakActivityView :
-    LeakContract {
+import com.drawingboardapps.memoryleak.core.FragmentRouter
 
+interface MVPLeakActivityView : LeakContract {
+    fun getFragmentRouter() : FragmentRouter
 }

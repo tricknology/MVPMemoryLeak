@@ -1,33 +1,67 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.presenter
 
 import android.util.Log
-import com.drawingboardapps.core.rx.SchedulerProvider
-import com.drawingboardapps.memoryleak.mvp.base.ui.mvp.ViewContract
-import com.drawingboardapps.memoryleak.mvp.ui.mvp.fragment.FragmentType
+import com.drawingboardapps.memoryleak.core.rx.SchedulerProvider
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.ViewContract
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.FragmentType
 import com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor.InteractorLeaksCallback
 import com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor.LeakInteractor
-import com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor.Result
-import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.ViewState
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.Result
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.ViewState
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 
+/**
+ * [PresenterLeaksViaCapturingLambdaRX] is a leaky presenter because it has a strong reference to
+ * view and the interactor.
+ * <br>
+ * This presenter has an RX component to it.
+ * work is wrapped in a [Single] and allowed to execute on the io thread of the [schedulerProvider].
+ * When the work is finished it notifies the observer on the ui thread of the [schedulerProvider].
+ * When the [Single] is subscribed to, its [Disposable] is added to [compositeDisposable] which is
+ * cleared when [PresenterLeaksViaCapturingLambdaRX.destroy] is called.
+ * <br>
+ *     Since onSuccess and onError callbacks are anonymous lambda functions which reference the
+ *     view and methods of the presenter, even though the subscription is disposed, the Disposable
+ *     still contains a final reference to the delegate.
+ *
+ */
 class PresenterLeaksViaCapturingLambdaRX(
-    val view: ViewContract,
-    private val schedulerProvider: SchedulerProvider = SchedulerProvider(),
-    private val interactor: LeakInteractor = InteractorLeaksCallback()
+    private val view: ViewContract,
+    private val interactor: LeakInteractor = InteractorLeaksCallback(),
+    private val schedulerProvider: SchedulerProvider = SchedulerProvider()
 ) : BasePresenter() {
-    private val disposable = CompositeDisposable()
 
+    /**
+     * Cause a leak using RX, subscribing on ui, observing on io.
+     * Changes the view (artificially) after performing some work.
+     */
     override fun causeLeak() {
         Log.d(TAG, "causeLeak: ")
-        disposable.add(
+        compositeDisposable.add(
             doWorkOnAnotherThread()
                 .observeOn(schedulerProvider.io())
                 .subscribeOn(schedulerProvider.ui())
+                .doOnSuccess{
+                    view.updateViewState(ViewState.Update("doOnSuccess"))
+                }.doOnError {
+                    displayError(Result.Fail(it))
+                }
                 .subscribe()
         )
         view.changeView(FragmentType.Leak)
     }
+
+    /**
+     * returns a single that invokes [PresenterLeaksViaCapturingLambdaRX.interactor].
+     * this interactor receives callbacks as parameters.
+     * <br>
+     * In this example,[PresenterLeaksViaCapturingLambdaRX.view] is accessed directly from the lambda
+     * as well as [PresenterLeaksViaCapturingLambdaRX.displayError].
+     * <br>
+     * The interactor therefore has an implicit reference to the presenter
+     * and its view and could potentially leak them.
+     *
+     */
     private fun doWorkOnAnotherThread(): Single<Unit> {
         Log.d(TAG, "doWorkOnAnotherThread: ")
 
@@ -48,24 +82,31 @@ class PresenterLeaksViaCapturingLambdaRX(
     }
 
 
+    /**
+     * Display an error message based on a [Result.Fail] message
+     */
     private fun displayError(failureResult: Result.Fail) {
         Log.d(TAG, "displayError: ")
-        val error = getFailureResutMessage(failureResult)
+        val error = getFailureResultMessage(failureResult)
         view.updateViewState(ViewState.Update(error))
     }
 
-    private fun getFailureResutMessage(failureResult: Result.Fail): String {
+    //TODO move to extension
+    private fun getFailureResultMessage(failureResult: Result.Fail): String {
         return failureResult.exception.message.toString()
     }
 
+    /**
+     * This will call clear on the [compositeDisposable]
+     */
     override fun avoidLeak() {
-        Log.d(TAG, "avoidLeak: disposing $disposable")
-
-        if (!disposable.isDisposed) {
-            disposable.clear()
-        }
+        Log.d(TAG, "avoidLeak:")
+       super.destroy()
     }
 
+    /**
+     * This will call [avoidLeak]
+     */
     override fun destroy() {
         Log.d(TAG, "destroy: ")
         avoidLeak()

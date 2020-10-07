@@ -1,9 +1,6 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor
 
-sealed class Result {
-    data class Success(val result: String) : Result()
-    data class Fail(val exception: Throwable) : Result()
-}
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.Result
 
 interface LeakInteractor {
 
@@ -14,4 +11,6 @@ interface LeakInteractor {
 
     fun destroy()
 }
+
+
 

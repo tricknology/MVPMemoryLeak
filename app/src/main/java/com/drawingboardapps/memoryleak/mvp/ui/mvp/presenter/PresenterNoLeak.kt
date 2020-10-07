@@ -1,11 +1,12 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.presenter
 
-import com.drawingboardapps.core.rx.SchedulerProvider
-import com.drawingboardapps.memoryleak.mvp.base.ui.mvp.ViewContract
-import com.drawingboardapps.memoryleak.mvp.ui.mvp.fragment.FragmentType
+import com.drawingboardapps.memoryleak.core.rx.SchedulerProvider
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.ViewContract
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.FragmentType
 import com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor.LeakInteractor
-import com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor.Result
-import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.ViewState
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor.SRPRxLiveInteractor
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.Result
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.ViewState
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 

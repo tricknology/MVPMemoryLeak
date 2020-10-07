@@ -1,11 +1,10 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor
 
 import android.util.Log
-import com.drawingboardapps.core.rx.SchedulerProvider
-import io.reactivex.rxjava3.core.Scheduler
+import com.drawingboardapps.memoryleak.core.rx.SchedulerProvider
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.Result
 /**
  * [execute] leaks the implementation through an anonymous thread
  */
