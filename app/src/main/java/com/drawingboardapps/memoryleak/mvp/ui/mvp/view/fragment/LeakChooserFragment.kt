@@ -37,7 +37,7 @@ class LeakChooserFragment : Fragment() {
                     else -> FragmentType.NoLeak
                 }
 
-            a.fragmentRouter.showFragment(
+            a.getFragmentRouter().showFragment(
                 FragmentRouter.Params(
                     activity = a,
                     fragmentHost = R.id.main_fragment_container,
