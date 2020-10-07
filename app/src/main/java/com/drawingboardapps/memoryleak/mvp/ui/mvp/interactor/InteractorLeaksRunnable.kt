@@ -1,7 +1,7 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.interactor
 
 import android.util.Log
-
+import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.Result
 /**
  * [execute] leaks the implementation through an anonymous thread
  */

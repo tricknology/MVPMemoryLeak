@@ -95,7 +95,7 @@ class FragmentB : FragmentBase(TAG),
         Log.d(TAG, "showFragment: activity = $activity")
 
         (activity as? MVPLeakActivity)?.let {
-            it.fragmentRouter.showFragment(
+            it.getFragmentRouter().showFragment(
                 FragmentRouter.Params(
                     activity = it,
                     fragmentHost = R.id.main_fragment_container,
