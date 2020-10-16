@@ -1,5 +1,6 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.view.fragment
 
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,18 +15,26 @@ import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.PresenterType
 import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.activity.MVPLeakActivity
 import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.LeakContract
 import kotlinx.android.synthetic.main.fragment_basic_a.*
+import kotlinx.android.synthetic.main.fragment_basic_a.button_leak
+import kotlinx.android.synthetic.main.fragment_basic_a.leak_icon
+import kotlinx.android.synthetic.main.fragment_basic_a.text
+import kotlinx.android.synthetic.main.fragment_basic_b.*
 
-class FragmentA : FragmentBase(TAG),
+class SafeFragment : FragmentBase(TAG),
     ViewContract, LeakContract {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        buttonPressCount = arguments?.getInt(BundleArgs.BUTTON_PRESS_COUNT) ?: 0
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         Log.d(TAG, "onCreateView: ")
-        val root = inflater.inflate(R.layout.fragment_basic_a, container, false)
-        return root
+        val view = inflater.inflate(R.layout.fragment_basic_a, container, false)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -44,9 +53,16 @@ class FragmentA : FragmentBase(TAG),
     private fun initViews() {
         Log.d(TAG, "initViews: ")
         setActionBarTitle(TAG)
-
+        with(leak_icon){
+            setImageResource(R.drawable.leak_icon_no)
+            setColorFilter(Color.GREEN)
+        }
+        if (buttonPressCount > 0){
+            button_leak.text = buttonPressCount.toString()
+        }
         button_leak.setOnClickListener {
             Log.d(TAG, "button_leak clicked: ")
+            buttonPressCount = buttonPressCount.inc()
             causeLeak()
         }
         text.text = """$TAG${getDetails()}"""
@@ -66,8 +82,10 @@ class FragmentA : FragmentBase(TAG),
                     fragmentArgs = Bundle().apply {
                         putParcelable(BundleArgs.PRESENTER_TYPE, presenterType)
                         putParcelable(BundleArgs.LEAK_TYPE, leakType)
+                        putInt(BundleArgs.BUTTON_PRESS_COUNT, buttonPressCount)
                     },
-                    addToBackStack = false
+                    addToBackStack = false,
+                    buttonPressCount = buttonPressCount
                 )
             )
         }
@@ -101,20 +119,23 @@ class FragmentA : FragmentBase(TAG),
     companion object {
         var presenterType: PresenterType? = null
         var leakType: LeakType? = null
+        var buttonPressCount: Int = 0
 
-        fun newInstance(leakType: LeakType, presenterType: PresenterType): FragmentA {
+        fun newInstance(leakType: LeakType, presenterType: PresenterType, buttonPressCount: Int): SafeFragment {
             Log.d(TAG, "newInstance: ")
             this.presenterType = presenterType
             this.leakType = leakType
+            this.buttonPressCount = buttonPressCount
 
-            return FragmentA().apply {
+            return SafeFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(BundleArgs.LEAK_TYPE, leakType)
                     putParcelable(BundleArgs.PRESENTER_TYPE, presenterType)
+                    putInt(BundleArgs.BUTTON_PRESS_COUNT, buttonPressCount)
                 }
             }
         }
 
-        val TAG: String = FragmentA::class.simpleName!!
+        val TAG: String = SafeFragment::class.simpleName!!
     }
 }

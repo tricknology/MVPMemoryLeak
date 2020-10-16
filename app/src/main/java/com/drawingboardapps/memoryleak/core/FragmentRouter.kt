@@ -9,8 +9,7 @@ import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.fragment.FragmentsFactory
 import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.LeakType
 import com.drawingboardapps.memoryleak.mvp.ui.mvp.model.PresenterType
 
-object FragmentRouter :
-    FragmentRouterContract {
+object FragmentRouter : FragmentRouterContract {
 
     /**
      * @param activity
@@ -26,7 +25,8 @@ object FragmentRouter :
         val presenterType: PresenterType,
         val leakType: LeakType,
         val fragmentArgs: Bundle?,
-        val addToBackStack: Boolean
+        val addToBackStack: Boolean,
+        val buttonPressCount: Int
     )
 
     /**
@@ -48,17 +48,15 @@ object FragmentRouter :
      * Note: commits allowing state loss
      * @param routerParams
      */
-    override fun showFragment(routerParams: Params
-    ) {
-        with(routerParams){
+    override fun showFragment(routerParams: Params) {
+        with(routerParams) {
+            val fragment = FragmentsFactory.getFragment(
+                fragmentType,
+                presenterType,
+                leakType,
+                buttonPressCount
+            )
             activity.supportFragmentManager.beginTransaction().apply {
-
-                val fragment =
-                    FragmentsFactory.getFragment(
-                        fragmentType,
-                        presenterType,
-                        leakType
-                    )
                 if (addToBackStack) addToBackStack(fragment.tag)
                 replace(fragmentHost, fragment, fragmentType.tag)
             }.commitAllowingStateLoss()
@@ -78,8 +76,6 @@ object FragmentRouter :
             flag ?: POP_BACK_STACK_INCLUSIVE
         )
     }
-
-
 
 
 }
