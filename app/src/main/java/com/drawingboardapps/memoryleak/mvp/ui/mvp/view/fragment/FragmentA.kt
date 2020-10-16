@@ -89,13 +89,11 @@ class FragmentA : FragmentBase(TAG),
 
     override fun causeLeak() {
         Log.d(TAG, "causeLeak: ")
-        presenter!!.causeLeak()
-        showFragment()
+        presenter?.causeLeak()
     }
 
     override fun avoidLeak() {
         Log.d(TAG, "showFragment: ")
-        showFragment()
         presenter?.destroy()
         presenter = null
     }
