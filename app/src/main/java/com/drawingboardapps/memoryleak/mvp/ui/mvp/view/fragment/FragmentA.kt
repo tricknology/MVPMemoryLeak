@@ -61,11 +61,11 @@ class FragmentA : FragmentBase(TAG),
                     activity = it,
                     fragmentHost = R.id.main_fragment_container,
                     fragmentType = FragmentType.NoLeak,
-                    presenterType = PresenterType.Nullable,
-                    leakType = LeakType.ViaRX,
+                    presenterType = presenterType!!,
+                    leakType = leakType!!,
                     fragmentArgs = Bundle().apply {
-                        putParcelable(BundleArgs.PRESENTER_TYPE, PresenterType.Nullable)
-                        putParcelable(BundleArgs.LEAK_TYPE, LeakType.ViaRX)
+                        putParcelable(BundleArgs.PRESENTER_TYPE, presenterType)
+                        putParcelable(BundleArgs.LEAK_TYPE, leakType)
                     },
                     addToBackStack = false
                 )

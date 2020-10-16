@@ -57,12 +57,12 @@ class PresenterLeaksViaCapturingCallback(
      */
     private fun displayError(failureResult: Result.Fail) {
         Log.d(TAG, "displayError: ")
-        val error = getFailureResutMessage(failureResult)
+        val error = getFailureResultMessage(failureResult)
         view.updateViewState(ViewState.Update(error))
     }
 
     //TODO inline function
-    private fun getFailureResutMessage(failureResult: Result.Fail): String {
+    private fun getFailureResultMessage(failureResult: Result.Fail): String {
         return failureResult.exception.message.toString()
     }
 

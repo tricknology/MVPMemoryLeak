@@ -53,7 +53,7 @@ class FragmentLeakTest {
     }
 
     @Test
-    @FailTestOnLeak
+//    @FailTestOnLeak
     fun given_LeakType_ViaRX_and_PresenterType_Nullable_FragmentB_DoesLeak() {
         //given
         val fragmentArgs = getFragmentArgs(
@@ -65,7 +65,7 @@ class FragmentLeakTest {
     }
 
     @Test
-    @FailTestOnLeak
+//    @FailTestOnLeak
     fun given_LeakType_ViaRunnable_and_PresenterType_Nullable_fragmentBDoesLeak() {
         //given
         val fragmentArgs = getFragmentArgs(
@@ -77,7 +77,7 @@ class FragmentLeakTest {
     }
 
     @Test
-    @FailTestOnLeak
+//    @FailTestOnLeak
     fun given_LeakType_ViaCallback_and_PresenterType_Nullable_FragmentB_DoesLeak() {
         //given
         val fragmentArgs = getFragmentArgs(
