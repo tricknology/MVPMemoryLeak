@@ -22,7 +22,6 @@ import com.drawingboardapps.memoryleak.mvp.ui.mvp.view.LeakItemRecyclerViewAdapt
  */
 class LeakChooserFragment : Fragment() {
 
-
     private var itemAdapter: LeakItemRecyclerViewAdapter? = null
     private var columnCount = 1
 
@@ -30,11 +29,12 @@ class LeakChooserFragment : Fragment() {
         (activity as? MVPLeakActivity)?.let { a ->
             val presenterType : PresenterType = (it.leakArgs[BundleArgs.PRESENTER_TYPE] as PresenterType)
             val leakType : LeakType = (it.leakArgs[BundleArgs.LEAK_TYPE] as LeakType)
+
+
             val fragmentType: FragmentType =
                 when(presenterType){
-                    is PresenterType.Nullable ->   FragmentType.NoLeak
-                    is PresenterType.NonNullable ->   FragmentType.Leak
-                    else -> FragmentType.NoLeak
+                    is PresenterType.Safe ->   FragmentType.NoLeak
+                    is PresenterType.Unsafe ->   FragmentType.Leak
                 }
 
             a.getFragmentRouter().showFragment(
@@ -45,42 +45,36 @@ class LeakChooserFragment : Fragment() {
                     presenterType = presenterType,
                     leakType = leakType,
                     fragmentArgs = arguments,
-                    addToBackStack = false
+                    addToBackStack = false,
+                    buttonPressCount = 0
                 )
             )
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-
-        }
-    }
-
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_leak_chooser_list, container, false)
 
         // Set the adapter
+        setUpRecyclerViewAdapter(view)
+        return view
+    }
+
+    private fun setUpRecyclerViewAdapter(view: View) {
         if (view is RecyclerView) {
             with(view) {
                 layoutManager = when {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                itemAdapter =
-                    LeakItemRecyclerViewAdapter(
-                        LeakContent.ITEMS,
-                        itemClickListener
-                    )
+                itemAdapter = LeakItemRecyclerViewAdapter(LeakContent.ITEMS, itemClickListener)
                 adapter = itemAdapter
             }
         }
-        return view
     }
 
     override fun onDestroyView() {
@@ -92,15 +86,9 @@ class LeakChooserFragment : Fragment() {
 
     companion object {
 
-        // TODO: Customize parameter argument names
-        const val ARG_COLUMN_COUNT = "column-count"
         val TAG: String = LeakChooserFragment::class.java.simpleName
 
-        // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance() =
-            LeakChooserFragment().apply {
-                arguments = Bundle().apply {}
-            }
+        fun newInstance() = LeakChooserFragment()
     }
 }

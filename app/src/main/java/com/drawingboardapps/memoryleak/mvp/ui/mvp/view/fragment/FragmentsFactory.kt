@@ -9,15 +9,16 @@ object FragmentsFactory {
     fun getFragment(
         fragmentType: FragmentType,
         presenterType: PresenterType,
-        leakType: LeakType
+        leakType: LeakType,
+        buttonPressCount: Int
     ): Fragment {
 
         return when (fragmentType) {
             FragmentType.NoLeak -> {
-                FragmentA.newInstance(leakType, presenterType)
+                SafeFragment.newInstance(leakType, presenterType, buttonPressCount)
             }
             FragmentType.Leak -> {
-                FragmentB.newInstance(leakType, presenterType)
+                LeakyFragment.newInstance(leakType, presenterType, buttonPressCount)
             }
             FragmentType.Chooser -> {
                 LeakChooserFragment.newInstance()

@@ -31,7 +31,7 @@ class MVPLeakActivity : AppCompatActivity(), MVPLeakActivityView, ViewContract {
         this.presenter = PresenterFactory.getPresenter(
             view = this,
             leakType = LeakType.ViaRunnable,
-            presenterType = PresenterType.Nullable
+            presenterType = PresenterType.Safe
         )
         initViews()
     }
@@ -44,10 +44,11 @@ class MVPLeakActivity : AppCompatActivity(), MVPLeakActivityView, ViewContract {
                 activity = this,
                 fragmentHost = R.id.main_fragment_container,
                 fragmentType = FragmentType.Chooser,
-                presenterType = PresenterType.NonNullable,
+                presenterType = PresenterType.Unsafe,
                 leakType = LeakType.ViaRX,
                 fragmentArgs = Bundle(),
-                addToBackStack = false
+                addToBackStack = false,
+                buttonPressCount = 0
             )
         )
     }

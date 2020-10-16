@@ -6,29 +6,20 @@ import java.util.ArrayList
 import java.util.HashMap
 
 /**
- * Helper class for providing sample content for user interfaces created by
- * Android template wizards.
- *
- * TODO: Replace all uses of this class before publishing your app.
+ * Contains hardcoded content regarding the types of leaks possible with this app
  */
 object LeakContent {
 
-    /**
-     * An array of sample (dummy) items.
-     */
     val ITEMS: MutableList<LeakItem> = ArrayList()
 
-    /**
-     * A map of sample (dummy) items, by ID.
-     */
-    val ITEM_MAP: MutableMap<String, LeakItem> = HashMap()
+    private val ITEM_MAP: MutableMap<String, LeakItem> = HashMap()
 
     init {
-        var i: Int = 0
-        var iStr: String = "0"
+        var index = 0
+        var iStr = "0"
         fun increment() {
-            i = i.inc()
-            iStr = i.toString()
+            index = index.inc()
+            iStr = index.toString()
         }
 
         fun createLeakArgs(leakType: LeakType, presenterType: PresenterType): Bundle {
@@ -39,22 +30,18 @@ object LeakContent {
         }
 
         fun addLeakType(leakArgs: Bundle) {
-            addItem(
-                LeakItem(
-                    iStr,
-                    leakArgs
-                ).also { increment() })
+            addItem(LeakItem(iStr, leakArgs).also { increment() })
         }
 
         //these do leak
-        addLeakType(createLeakArgs(LeakType.ViaCallback, PresenterType.NonNullable))
-        addLeakType(createLeakArgs(LeakType.ViaRX, PresenterType.NonNullable))
-        addLeakType(createLeakArgs(LeakType.ViaRunnable, PresenterType.NonNullable))
+        addLeakType(createLeakArgs(LeakType.ViaCallback, PresenterType.Unsafe))
+        addLeakType(createLeakArgs(LeakType.ViaRX, PresenterType.Unsafe))
+        addLeakType(createLeakArgs(LeakType.ViaRunnable, PresenterType.Unsafe))
 
         //these do not leak
-        addLeakType(createLeakArgs(LeakType.ViaCallback, PresenterType.Nullable))
-        addLeakType(createLeakArgs(LeakType.ViaRX, PresenterType.Nullable))
-        addLeakType(createLeakArgs(LeakType.ViaRunnable, PresenterType.Nullable))
+        addLeakType(createLeakArgs(LeakType.ViaCallback, PresenterType.Safe))
+        addLeakType(createLeakArgs(LeakType.ViaRX, PresenterType.Safe))
+        addLeakType(createLeakArgs(LeakType.ViaRunnable, PresenterType.Safe))
 
     }
 
@@ -67,15 +54,41 @@ object LeakContent {
     /**
      * A dummy item representing a piece of content.
      */
-    data class LeakItem(val id: String, val leakArgs: Bundle) {
+    data class LeakItem(val id: String = "", val leakArgs: Bundle) {
         override fun toString(): String = leakArgs.toString()
 
         fun getDescription(): CharSequence? {
-            return StringBuilder().apply {
-                append("L Type: ${leakArgs[BundleArgs.LEAK_TYPE]?.javaClass?.simpleName}\n")
-                append("P Type: ${leakArgs[BundleArgs.PRESENTER_TYPE]?.javaClass?.simpleName}")
-            }.toString()
+            val presenterType: PresenterType? =
+                leakArgs[BundleArgs.PRESENTER_TYPE] as? PresenterType
+            val leakType: LeakType? = leakArgs[BundleArgs.LEAK_TYPE] as? LeakType
 
+            return StringBuilder()
+                .apply {
+                    append("Leak Type            : ${leakArgs[BundleArgs.LEAK_TYPE]?.javaClass?.simpleName}\n")
+                    append("Presenter View   : ${leakArgs[BundleArgs.PRESENTER_TYPE]?.javaClass?.simpleName}\n")
+                    append("Leakable              : ${canLeakTypeLeadToLeak(leakType)}\n")
+                    append("Does Leak           : ${shouldPresenterLeak(presenterType)}")
+                }.toString()
         }
+
+        companion object{
+            fun canLeakTypeLeadToLeak(leakType: LeakType?): Boolean? {
+                return when (leakType) {
+                    is LeakType.ViaCallback -> true
+                    is LeakType.ViaRX -> true
+                    is LeakType.ViaRunnable -> true
+                    else -> null
+                }
+            }
+
+            fun shouldPresenterLeak(presenterType: PresenterType?): Boolean? {
+                return when (presenterType) {
+                    is PresenterType.Unsafe -> true
+                    is PresenterType.Safe -> false
+                    else -> null
+                }
+            }
+        }
+
     }
 }

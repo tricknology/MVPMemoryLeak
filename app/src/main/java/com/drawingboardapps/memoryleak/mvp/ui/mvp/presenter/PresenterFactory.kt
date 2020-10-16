@@ -16,9 +16,9 @@ object PresenterFactory {
     ): BasePresenter {
         val interactor = InteractorFactory().getInteractor(leakType)
         return when (presenterType) {
-            is PresenterType.Nullable -> getSafePresenter(view, interactor)
-            is PresenterType.NonNullable -> getLeakyPresenter(view, leakType, interactor)
+            is PresenterType.Unsafe -> getLeakyPresenter(view, leakType, interactor)
             is PresenterType.Safe -> getSafePresenter(view, interactor)
+//            is PresenterType.Mutable -> getSafePresenter(view, interactor)
         }.also {
             Log.d("PresenterFactory", "view: $view")
             Log.d("PresenterFactory", "leakType: $leakType")

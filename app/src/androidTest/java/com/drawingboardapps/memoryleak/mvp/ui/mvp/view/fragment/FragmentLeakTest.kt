@@ -19,73 +19,73 @@ class FragmentLeakTest {
 
     @Test
     @FailTestOnLeak
-    fun given_LeakType_ViaRX_and_PresenterType_Safe_FragmentA_DoesNotLeak() {
+    fun given_LeakType_ViaRX_and_PresenterType_Safe_FragmentA_Does_Not_Leak() {
         //given
         val fragmentArgs = getFragmentArgs(
             LeakType.ViaRX,
             PresenterType.Safe
         )
         //when
-        executeTestOnFragment<FragmentA>(fragmentArgs)
+        executeTestOnFragment<SafeFragment>(fragmentArgs)
     }
 
     @Test
     @FailTestOnLeak
-    fun given_LeakType_ViaCallback_and_PresenterType_Safe_FragmentA_DoesNotLeak() {
+    fun given_LeakType_ViaCallback_and_PresenterType_Safe_FragmentA_Does_Not_Leak() {
         //given
         val fragmentArgs = getFragmentArgs(
             LeakType.ViaCallback,
             PresenterType.Safe
         )
         //when
-        executeTestOnFragment<FragmentA>(fragmentArgs)
+        executeTestOnFragment<SafeFragment>(fragmentArgs)
     }
     @Test
     @FailTestOnLeak
-    fun given_LeakType_ViaRunnable_and_PresenterType_Safe_FragmentA_DoesNotLeak() {
+    fun given_LeakType_ViaRunnable_and_PresenterType_Safe_FragmentA_Does_Not_Leak() {
         //given
         val fragmentArgs = getFragmentArgs(
             LeakType.ViaRunnable,
             PresenterType.Safe
         )
         //when
-        executeTestOnFragment<FragmentA>(fragmentArgs)
+        executeTestOnFragment<SafeFragment>(fragmentArgs)
     }
 
     @Test
-//    @FailTestOnLeak
-    fun given_LeakType_ViaRX_and_PresenterType_Nullable_FragmentB_DoesLeak() {
+    @FailTestOnLeak
+    fun given_LeakType_ViaRX_and_PresenterType_Immutable_FragmentB_Does_Leak() {
         //given
         val fragmentArgs = getFragmentArgs(
             LeakType.ViaRX,
-            PresenterType.Nullable
+            PresenterType.Unsafe
         )
         //when
-        executeTestOnFragment<FragmentB>(fragmentArgs)
+        executeTestOnFragment<LeakyFragment>(fragmentArgs)
     }
 
     @Test
-//    @FailTestOnLeak
-    fun given_LeakType_ViaRunnable_and_PresenterType_Nullable_fragmentBDoesLeak() {
+    @FailTestOnLeak
+    fun given_LeakType_ViaRunnable_and_PresenterType_Immutable_fragmentB_Does_Leak() {
         //given
         val fragmentArgs = getFragmentArgs(
             LeakType.ViaRunnable,
-            PresenterType.Nullable
+            PresenterType.Unsafe
         )
         //when
-        executeTestOnFragment<FragmentB>(fragmentArgs)
+        executeTestOnFragment<LeakyFragment>(fragmentArgs)
     }
 
     @Test
-//    @FailTestOnLeak
-    fun given_LeakType_ViaCallback_and_PresenterType_Nullable_FragmentB_DoesLeak() {
+    @FailTestOnLeak
+    fun given_LeakType_ViaCallback_and_PresenterType_Immutable_FragmentB_Does_Leak() {
         //given
         val fragmentArgs = getFragmentArgs(
             LeakType.ViaCallback,
-            PresenterType.Nullable
+            PresenterType.Unsafe
         )
         //when
-        with(getFragmentScenario<FragmentB>(fragmentArgs)) {
+        with(getFragmentScenario<LeakyFragment>(fragmentArgs)) {
             Log.d("FragmentFactoryTest", "pressing button")
             onFragment { it.presenter?.causeLeak() }
         }

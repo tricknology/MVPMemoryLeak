@@ -12,6 +12,5 @@ sealed class LeakType : Parcelable {
 
     @Parcelize
     object ViaRX : LeakType()
-//    @Parcelize
-//    object NoLeak : LeakType()
+
 }
