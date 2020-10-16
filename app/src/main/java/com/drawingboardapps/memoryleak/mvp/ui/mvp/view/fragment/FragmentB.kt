@@ -1,5 +1,6 @@
 package com.drawingboardapps.memoryleak.mvp.ui.mvp.view.fragment
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -46,8 +47,8 @@ class FragmentB : FragmentBase(TAG),
 
     override fun setActionBarTitle(text: String) {
         activity?.actionBar.let {
-            Log.d(FragmentA.TAG, "setActionBarTitle: $it")
-            Log.d(FragmentA.TAG, "setActionBarTitle: text $text")
+            Log.d(TAG, "setActionBarTitle: $it")
+            Log.d(TAG, "setActionBarTitle: text $text")
             it?.title = text
         }
 
@@ -55,8 +56,8 @@ class FragmentB : FragmentBase(TAG),
 
     override fun onDestroyView() {
         Log.d(TAG, "onDestroyView: ")
-        super.onDestroyView()
         avoidLeak()
+        super.onDestroyView()
     }
 
 
@@ -67,12 +68,17 @@ class FragmentB : FragmentBase(TAG),
         when (state) {
             is ViewState.Update -> {
                 Log.d(TAG, "updateViewState ${state.text}")
-                setViewText(state.text)
-                textViewReference.text = state.text
+                activity?.runOnUiThread{
+                    setViewText(state.text)
+                }
             }
         }
     }
 
+    override fun setViewText(text: String) {
+        textViewReference.text = text
+        super.setViewText(text)
+    }
 
     override fun changeView(viewComponent: FragmentType) {
         Log.d(TAG, "changeView: $viewComponent")
@@ -85,6 +91,7 @@ class FragmentB : FragmentBase(TAG),
     override fun causeLeak() {
         Log.d(TAG, "causeLeak: presenter = $presenter")
         presenter?.causeLeak()
+        showFragment()
     }
 
     override fun avoidLeak() {
@@ -109,6 +116,7 @@ class FragmentB : FragmentBase(TAG),
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initViews() {
         Log.d(TAG, "initViews: ")
         button_leak.setOnClickListener {
@@ -116,7 +124,7 @@ class FragmentB : FragmentBase(TAG),
             causeLeak()
         }
         textViewReference = text
-        textViewReference.text = """$TAG${getDetails()}"""
+        textViewReference.text = "$TAG${getDetails()}"
 
 
         Log.d(TAG, "initViews: setting action bar title...")

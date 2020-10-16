@@ -25,6 +25,7 @@ import io.reactivex.rxjava3.core.Single
  *     still contains a final reference to the delegate.
  *
  */
+@Suppress("KDocUnresolvedReference")
 class PresenterLeaksViaCapturingLambdaRX(
     private val view: ViewContract,
     private val interactor: LeakInteractor = InteractorLeaksCallback(),
@@ -39,14 +40,10 @@ class PresenterLeaksViaCapturingLambdaRX(
         Log.d(TAG, "causeLeak: ")
         compositeDisposable.add(
             doWorkOnAnotherThread()
-                .observeOn(schedulerProvider.io())
-                .subscribeOn(schedulerProvider.ui())
-                .doOnSuccess{
-                    view.updateViewState(ViewState.Update("doOnSuccess"))
-                }.doOnError {
-                    displayError(Result.Fail(it))
-                }
-                .subscribe()
+                .observeOn(schedulerProvider.ui())
+                .subscribeOn(schedulerProvider.io())
+                .doOnError { displayError(Result.Fail(it)) }
+                .subscribe { _ -> displaySuccess("onSuccess") }
         )
         view.changeView(FragmentType.Leak)
     }
@@ -70,8 +67,7 @@ class PresenterLeaksViaCapturingLambdaRX(
             interactor(
                 onSuccess = {
                     Log.d(TAG, "onSuccess: ")
-                    val state = ViewState.Update(it.result)
-                    view.updateViewState(state)
+                    displaySuccess(it.result)
                 },
                 onError = {
                     Log.d(TAG, "onError: ")
@@ -79,6 +75,10 @@ class PresenterLeaksViaCapturingLambdaRX(
                 }
             )
         }.also { Log.d(TAG, "returning single: ") }
+    }
+
+    private fun displaySuccess(msg : String) {
+        view.updateViewState(ViewState.Update(msg) )
     }
 
 
